@@ -1,32 +1,37 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News24 - Notizie in Tempo Reale</title>
+    <title>News24 - Real-Time News</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Slab:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header con Data e Ora -->
+    <!-- Header with Date, Time and Refresh Button -->
     <header>
         <div class="container header-content">
             <div class="logo">
                 <i class="fas fa-newspaper"></i> News24
             </div>
-            <div class="datetime">
-                <div class="date" id="current-date">Mercoledì, 1 Gennaio 2025</div>
-                <div class="time" id="current-time">00:00:00</div>
+            <div class="header-right">
+                <div class="datetime">
+                    <div class="date" id="current-date">Wednesday, January 1, 2026</div>
+                    <div class="time" id="current-time">00:00:00</div>
+                </div>
+                <button id="refresh-news" class="refresh-btn" title="Refresh News">
+                    <i class="fas fa-sync-alt"></i> Refresh Now
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Navigazione Categorie -->
+    <!-- Category Navigation -->
     <nav>
         <div class="container">
             <div class="categories">
-                <button class="category-btn active" data-category="top">Top Storie</button>
+                <button class="category-btn active" data-category="top">Top Stories</button>
                 <button class="category-btn" data-category="world">World</button>
                 <button class="category-btn" data-category="sport">Sport</button>
                 <button class="category-btn" data-category="finance">Finance</button>
@@ -35,30 +40,33 @@
         </div>
     </nav>
 
-    <!-- Contenuto Principale -->
+    <!-- Main Content -->
     <main>
         <div class="container">
-            <h2 class="section-title" id="section-title">Top Storie</h2>
+            <div class="section-header">
+                <h2 class="section-title" id="section-title">Top Stories</h2>
+                <div class="news-count" id="news-count">Loading...</div>
+            </div>
             <div class="news-grid" id="news-container">
-                <!-- Le notizie verranno caricate qui -->
+                <!-- News will be loaded here -->
                 <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> Caricamento notizie in corso...
+                    <i class="fas fa-spinner fa-spin"></i> Loading news...
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Footer con Credit API e Icone Tecnologie -->
+    <!-- Footer with API Credits and Technology Icons -->
     <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="api-credits">
-                    <h3>Crediti API</h3>
-                    <p>Questo sito utilizza API pubbliche per fornire notizie in tempo reale:<br>
-                    - Spaceflight News API per notizie sullo spazio<br>
-                    - Free News API per notizie generali, sport e finanza<br>
-                    - World News API per notizie internazionali<br>
-                    Tutte le API sono pubbliche e non richiedono registrazione.</p>
+                    <h3>API Credits</h3>
+                    <p>This website uses public APIs to provide real-time news:<br>
+                    - Spaceflight News API for space news<br>
+                    - Free News API for general news, sports and finance<br>
+                    - World News API for international news<br>
+                    All APIs are public and do not require registration.</p>
                 </div>
                 <div class="tech-icons">
                     <div class="tech-icon html-icon">
@@ -76,7 +84,7 @@
                 </div>
             </div>
             <div class="copyright">
-                &copy; 2023 News24 - Tutti i diritti riservati. Sito realizzato con HTML, CSS e JavaScript.
+                &copy; 2026 News24 - All rights reserved. Website built with HTML, CSS and JavaScript.
             </div>
         </div>
     </footer>
