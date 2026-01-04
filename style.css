@@ -18,7 +18,7 @@ body {
     padding: 0 15px;
 }
 
-/* Header e Data/Ora */
+/* Header with Date, Time and Refresh Button */
 header {
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     color: white;
@@ -48,6 +48,12 @@ header {
     color: #ffcc00;
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
 .datetime {
     text-align: right;
     font-size: 15px;
@@ -68,7 +74,31 @@ header {
     letter-spacing: 1px;
 }
 
-/* Navigazione Categorie */
+.refresh-btn {
+    background: #ffcc00;
+    color: #1e3c72;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.refresh-btn:hover {
+    background: #ffd633;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 204, 0, 0.3);
+}
+
+.refresh-btn:active {
+    transform: translateY(0);
+}
+
+/* Category Navigation */
 nav {
     background-color: #f8f9fa;
     padding: 15px 0;
@@ -113,16 +143,31 @@ main {
     padding: 30px 0 50px;
 }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
 .section-title {
     font-family: 'Roboto Slab', serif;
     font-size: 28px;
-    margin-bottom: 25px;
     color: #1e3c72;
     border-left: 5px solid #ffcc00;
     padding-left: 15px;
 }
 
-/* Grid Notizie */
+.news-count {
+    background: #f0f7ff;
+    color: #2a5298;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* News Grid */
 .news-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -181,6 +226,7 @@ main {
     font-size: 13px;
     color: #888;
     margin-top: auto;
+    margin-bottom: 15px;
 }
 
 .news-source {
@@ -189,6 +235,27 @@ main {
     padding: 3px 8px;
     border-radius: 4px;
     font-weight: 500;
+}
+
+.read-now-btn {
+    background: #2a5298;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s ease;
+    margin-top: 5px;
+}
+
+.read-now-btn:hover {
+    background: #1e3c72;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(42, 82, 152, 0.3);
 }
 
 .loading {
@@ -291,8 +358,13 @@ footer {
         gap: 15px;
     }
     
+    .header-right {
+        flex-direction: column;
+        width: 100%;
+    }
+    
     .datetime {
-        align-self: center;
+        width: 100%;
     }
     
     .categories {
@@ -308,6 +380,12 @@ footer {
     .footer-content {
         flex-direction: column;
         text-align: center;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
 }
 
