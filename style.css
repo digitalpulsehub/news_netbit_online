@@ -98,6 +98,12 @@ header {
     transform: translateY(0);
 }
 
+.refresh-btn.refreshing {
+    background: #1e3c72;
+    color: white;
+    cursor: not-allowed;
+}
+
 /* Category Navigation */
 nav {
     background-color: #f8f9fa;
@@ -195,6 +201,7 @@ main {
     width: 100%;
     object-fit: cover;
     background-color: #f0f0f0;
+    border-bottom: 3px solid #ffcc00;
 }
 
 .news-content {
@@ -250,6 +257,10 @@ main {
     display: block;
     transition: all 0.3s ease;
     margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .read-now-btn:hover {
@@ -404,5 +415,10 @@ footer {
     
     .logo {
         font-size: 24px;
+    }
+    
+    .refresh-btn {
+        padding: 8px 15px;
+        font-size: 14px;
     }
 }
