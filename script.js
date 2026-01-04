@@ -1,235 +1,123 @@
-// Data e ora in tempo reale
+// Real-time date and time
 function updateDateTime() {
     const now = new Date();
     
-    // Formatta la data
+    // Format date
     const optionsDate = { 
         weekday: 'long', 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric' 
     };
-    const dateStr = now.toLocaleDateString('it-IT', optionsDate);
+    const dateStr = now.toLocaleDateString('en-US', optionsDate);
     
-    // Formatta l'ora
+    // Format time
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     const timeStr = `${hours}:${minutes}:${seconds}`;
     
-    // Aggiorna il DOM
+    // Update DOM
     document.getElementById('current-date').textContent = dateStr;
     document.getElementById('current-time').textContent = timeStr;
 }
 
-// Chiama la funzione ogni secondo
+// Call function every second
 setInterval(updateDateTime, 1000);
-updateDateTime(); // Chiamata iniziale
+updateDateTime(); // Initial call
 
-// Variabili globali
+// Global variables
 let currentCategory = 'top';
+let currentNewsData = [];
+
 const apiEndpoints = {
-    'top': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=9',
-    'space': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=9',
+    'top': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=18',
+    'space': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=3',
     'world': 'https://free-apis.github.io/free-apis/apis/news#getNewsByCategory/world',
     'sport': 'https://free-apis.github.io/free-apis/apis/news#getNewsByCategory/sports',
     'finance': 'https://free-apis.github.io/free-apis/apis/news#getNewsByCategory/finance'
 };
 
-// Dati di esempio per quando le API non sono disponibili
+// Sample data for when APIs are not available
 const sampleNews = {
-    'top': [
-        { 
-            title: "Nuova scoperta nello spazio profondo", 
-            description: "Gli scienziati hanno individuato un nuovo esopianeta con caratteristiche simili alla Terra.",
-            image: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80",
-            source: "Space News",
-            published_at: "2023-10-15T10:30:00Z"
-        },
-        { 
-            title: "Innovazione tecnologica nel 2023", 
-            description: "Le nuove tecnologie stanno rivoluzionando il settore dell'informazione e della comunicazione.",
-            image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Tech Today",
-            published_at: "2023-10-14T14:20:00Z"
-        },
-        { 
-            title: "Cambiamenti climatici: ultimi sviluppi", 
-            description: "La conferenza internazionale sul clima discute nuove strategie per ridurre le emissioni.",
-            image: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Eco News",
-            published_at: "2023-10-13T09:15:00Z"
-        },
-        { 
-            title: "Avanzamenti nella ricerca medica", 
-            description: "Scoperto un nuovo trattamento potenzialmente efficace per una malattia rara.",
-            image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Health Journal",
-            published_at: "2023-10-12T16:45:00Z"
-        },
-        { 
-            title: "Nuova legge sulla privacy digitale", 
-            description: "Il parlamento approva una nuova normativa per la protezione dei dati personali online.",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Digital Law",
-            published_at: "2023-10-11T11:30:00Z"
-        },
-        { 
-            title: "Record di visitatori nei musei nazionali", 
-            description: "Dopo la pandemia, i musei registrano un aumento record di visitatori.",
-            image: "https://images.unsplash.com/photo-1580137189272-c9379f8864fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Culture News",
-            published_at: "2023-10-10T13:20:00Z"
-        },
-        { 
-            title: "Innovazioni nell'agricoltura sostenibile", 
-            description: "Nuove tecniche agricole promettono di aumentare la produzione riducendo l'impatto ambientale.",
-            image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1332&q=80",
-            source: "AgriTech",
-            published_at: "2023-10-09T08:10:00Z"
-        },
-        { 
-            title: "Crescita del mercato dell'auto elettrica", 
-            description: "Le vendite di veicoli elettrici aumentano del 40% rispetto all'anno precedente.",
-            image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
-            source: "Auto News",
-            published_at: "2023-10-08T15:55:00Z"
-        },
-        { 
-            title: "Nuova mostra d'arte contemporanea", 
-            description: "Inaugurata una mostra che riunisce opere di artisti emergenti da tutto il mondo.",
-            image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80",
-            source: "Art World",
-            published_at: "2023-10-07T18:40:00Z"
-        }
-    ],
-    'world': [
-        { 
-            title: "Vertice internazionale per la pace", 
-            description: "Leader mondiali si incontrano per discutere soluzioni ai conflitti in corso.",
-            image: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80",
-            source: "World News",
-            published_at: "2023-10-15T12:45:00Z"
-        },
-        { 
-            title: "Nuovo accordo commerciale globale", 
-            description: "Firmato un importante patto tra diverse nazioni per facilitare gli scambi commerciali.",
-            image: "https://images.unsplash.com/photo-1551135049-8a33b2fb2f5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Global Affairs",
-            published_at: "2023-10-14T16:30:00Z"
-        },
-        { 
-            title: "Crisi umanitaria: appello internazionale", 
-            description: "Le organizzazioni umanitarie lanciano un appello per aiutare le popolazioni colpite.",
-            image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Humanitarian News",
-            published_at: "2023-10-13T11:20:00Z"
-        }
-    ],
-    'sport': [
-        { 
-            title: "Campionato mondiale di calcio 2023", 
-            description: "Le squadre si preparano per la fase finale del torneo più atteso dell'anno.",
-            image: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80",
-            source: "Sport News",
-            published_at: "2023-10-15T08:15:00Z"
-        },
-        { 
-            title: "Record mondiale nei 100 metri", 
-            description: "Un atleta stabilisce un nuovo record mondiale nella gara dei 100 metri piani.",
-            image: "https://images.unsplash.com/photo-1552674605-db6ffd8facb5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Athletics World",
-            published_at: "2023-10-14T19:40:00Z"
-        },
-        { 
-            title: "Olimpiadi 2024: ultimi preparativi", 
-            description: "La città ospitante si prepara ad accogliere atleti da tutto il mondo.",
-            image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1190&q=80",
-            source: "Olympic News",
-            published_at: "2023-10-13T13:25:00Z"
-        }
-    ],
-    'finance': [
-        { 
-            title: "Mercati finanziari in ripresa", 
-            description: "Dopo un periodo di volatilità, i mercati mostrano segnali di ripresa.",
-            image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Financial Times",
-            published_at: "2023-10-15T17:10:00Z"
-        },
-        { 
-            title: "Nuova criptovaluta lanciata con successo", 
-            description: "Una nuova criptovaluta promette di rivoluzionare il settore finanziario.",
-            image: "https://images.unsplash.com/photo-1620336655055-bd87c5d1d73f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-            source: "Crypto News",
-            published_at: "2023-10-14T21:55:00Z"
-        },
-        { 
-            title: "Banche centrali alzano i tassi d'interesse", 
-            description: "Le principali banche centrali aumentano i tassi per contrastare l'inflazione.",
-            image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w-1211&q=80",
-            source: "Economic Journal",
-            published_at: "2023-10-13T10:05:00Z"
-        }
-    ],
-    'space': [
-        { 
-            title: "Lancio di un nuovo satellite per osservazione terrestre", 
-            description: "Una nuova missione spaziale è stata lanciata per monitorare i cambiamenti climatici.",
-            image: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80",
-            source: "Spaceflight News",
-            published_at: "2023-10-15T11:20:00Z"
-        },
-        { 
-            title: "Scoperta di acqua su Marte", 
-            description: "Nuove prove confermano la presenza di acqua liquida sotto la superficie marziana.",
-            image: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80",
-            source: "Planetary Science",
-            published_at: "2023-10-14T15:45:00Z"
-        },
-        { 
-            title: "Missione con equipaggio verso la Luna", 
-            description: "Preparativi in corso per la prossima missione umana verso il satellite terrestre.",
-            image: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80",
-            source: "Lunar Exploration",
-            published_at: "2023-10-13T07:30:00Z"
-        }
-    ]
+    'top': Array.from({length: 18}, (_, i) => ({
+        title: `Top Story ${i + 1}: Major breakthrough in technology`,
+        description: `This is a sample description for top story ${i + 1}. In a major development, researchers have made significant progress in the field of artificial intelligence.`,
+        image: `https://images.unsplash.com/photo-${1518709268805 + i}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80`,
+        source: ["Tech News", "Science Daily", "Innovation Today", "Future Tech"][i % 4],
+        published_at: new Date(Date.now() - i * 86400000).toISOString(),
+        url: `https://example.com/news/top-story-${i + 1}`
+    })),
+    'world': Array.from({length: 3}, (_, i) => ({
+        title: `World News ${i + 1}: Global summit addresses climate change`,
+        description: `World leaders gathered to discuss urgent measures to combat climate change and its effects on the global population.`,
+        image: `https://images.unsplash.com/photo-${1551135049 + i}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80`,
+        source: ["Global News", "World Affairs", "International Report"][i % 3],
+        published_at: new Date(Date.now() - i * 86400000).toISOString(),
+        url: `https://example.com/news/world-${i + 1}`
+    })),
+    'sport': Array.from({length: 3}, (_, i) => ({
+        title: `Sport News ${i + 1}: Championship finals approach`,
+        description: `Teams prepare for the final matches of the season with high stakes and intense competition expected.`,
+        image: `https://images.unsplash.com/photo-${1575361204480 + i}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1171&q=80`,
+        source: ["Sports Network", "Athletic News", "Championship Report"][i % 3],
+        published_at: new Date(Date.now() - i * 86400000).toISOString(),
+        url: `https://example.com/news/sport-${i + 1}`
+    })),
+    'finance': Array.from({length: 3}, (_, i) => ({
+        title: `Finance News ${i + 1}: Market trends show positive growth`,
+        description: `Financial markets demonstrate resilience with promising indicators for economic recovery in the coming quarter.`,
+        image: `https://images.unsplash.com/photo-${1611974789855 + i}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80`,
+        source: ["Financial Times", "Market Watch", "Economic Bulletin"][i % 3],
+        published_at: new Date(Date.now() - i * 86400000).toISOString(),
+        url: `https://example.com/news/finance-${i + 1}`
+    })),
+    'space': Array.from({length: 3}, (_, i) => ({
+        title: `Space News ${i + 1}: New discoveries in the cosmos`,
+        description: `Astronomers have made groundbreaking observations that could reshape our understanding of the universe.`,
+        image: `https://images.unsplash.com/photo-${1446776653964 + i}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1171&q=80`,
+        source: ["Space Exploration", "Astronomy Today", "Cosmic News"][i % 3],
+        published_at: new Date(Date.now() - i * 86400000).toISOString(),
+        url: `https://example.com/news/space-${i + 1}`
+    }))
 };
 
-// Funzione per formattare la data
+// Format date
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('it-IT', {
+    return date.toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'short',
         year: 'numeric'
     });
 }
 
-// Funzione per caricare le notizie
-async function loadNews(category) {
+// Load news
+async function loadNews(category, showLoading = true) {
     const container = document.getElementById('news-container');
     const title = document.getElementById('section-title');
+    const countElement = document.getElementById('news-count');
     
-    // Mostra stato di caricamento
-    container.innerHTML = `
-        <div class="loading">
-            <i class="fas fa-spinner fa-spin"></i> Caricamento notizie ${category}...
-        </div>
-    `;
+    // Show loading state
+    if (showLoading) {
+        container.innerHTML = `
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading ${category} news...
+            </div>
+        `;
+    }
     
-    // Aggiorna il titolo della sezione
+    // Update section title
     const categoryTitles = {
-        'top': 'Top Storie',
-        'world': 'Notizie Mondiali',
-        'sport': 'Sport',
-        'finance': 'Finanza',
-        'space': 'Spazio'
+        'top': 'Top Stories',
+        'world': 'World News',
+        'sport': 'Sports',
+        'finance': 'Finance',
+        'space': 'Space'
     };
-    title.textContent = categoryTitles[category] || 'Notizie';
+    title.textContent = categoryTitles[category] || 'News';
     
-    // Aggiorna lo stato attivo dei pulsanti
+    // Update active button state
     document.querySelectorAll('.category-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.category === category) {
@@ -237,82 +125,101 @@ async function loadNews(category) {
         }
     });
     
-    // Aggiorna la categoria corrente
+    // Update current category
     currentCategory = category;
     
     try {
         let newsData;
         
-        // Per la categoria 'space' e 'top' usa l'API reale di Spaceflight News
+        // For 'space' and 'top' categories use real Spaceflight News API
         if (category === 'space' || category === 'top') {
             const response = await fetch(apiEndpoints[category]);
             
             if (!response.ok) {
-                throw new Error(`Errore API: ${response.status}`);
+                throw new Error(`API Error: ${response.status}`);
             }
             
             const data = await response.json();
             
-            // Trasforma i dati dell'API nello stesso formato dei nostri dati di esempio
-            newsData = data.results.map(item => ({
+            // Transform API data to our format
+            newsData = data.results.map((item, index) => ({
                 title: item.title,
-                description: item.summary || "Nessuna descrizione disponibile",
-                image: item.image_url || "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80",
+                description: item.summary || "No description available",
+                image: item.image_url || `https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80`,
                 source: item.news_site || "Spaceflight News",
-                published_at: item.published_at
+                published_at: item.published_at,
+                url: item.url || `https://example.com/news/${category}-${index + 1}`
             }));
             
-            // Se non ci sono abbastanza notizie, integra con dati di esempio
-            if (newsData.length < 3) {
-                newsData = newsData.concat(sampleNews[category].slice(0, 3 - newsData.length));
+            // If not enough news, supplement with sample data
+            const expectedCount = category === 'top' ? 18 : 3;
+            if (newsData.length < expectedCount) {
+                const supplementCount = expectedCount - newsData.length;
+                newsData = newsData.concat(sampleNews[category].slice(0, supplementCount));
             }
         } else {
-            // Per altre categorie, usa i dati di esempio
-            // In un'app reale, qui si farebbe una chiamata alle API appropriate
+            // For other categories, use sample data
+            // In a real app, you would make API calls here
             newsData = sampleNews[category];
             
-            // Simula un ritardo di rete
-            await new Promise(resolve => setTimeout(resolve, 800));
+            // Simulate network delay
+            if (showLoading) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
         }
         
-        // Renderizza le notizie
+        // Limit to expected count
+        const expectedCount = category === 'top' ? 18 : 3;
+        newsData = newsData.slice(0, expectedCount);
+        
+        // Store current news data
+        currentNewsData = newsData;
+        
+        // Update news count
+        countElement.textContent = `${newsData.length} news items`;
+        
+        // Render news
         renderNews(newsData);
         
     } catch (error) {
-        console.error('Errore nel caricamento delle notizie:', error);
+        console.error('Error loading news:', error);
         
-        // In caso di errore, usa i dati di esempio
-        const newsData = sampleNews[category] || sampleNews.top;
+        // In case of error, use sample data
+        let newsData = sampleNews[category] || sampleNews.top;
+        const expectedCount = category === 'top' ? 18 : 3;
+        newsData = newsData.slice(0, expectedCount);
+        currentNewsData = newsData;
+        
+        countElement.textContent = `${newsData.length} news items`;
         renderNews(newsData);
         
-        // Mostra un messaggio di errore
-        container.innerHTML += `
-            <div class="loading" style="grid-column: span 3; color: #d32f2f; margin-top: 20px;">
-                <i class="fas fa-exclamation-triangle"></i> 
-                Impossibile caricare le notizie in tempo reale. Mostriamo notizie di esempio.
-            </div>
-        `;
+        // Show error message
+        if (showLoading) {
+            container.innerHTML += `
+                <div class="loading" style="grid-column: span 3; color: #d32f2f; margin-top: 20px;">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Unable to load real-time news. Showing sample news.
+                </div>
+            `;
+        }
     }
 }
 
-// Funzione per visualizzare le notizie
+// Function to render news
 function renderNews(newsItems) {
     const container = document.getElementById('news-container');
     
     if (!newsItems || newsItems.length === 0) {
         container.innerHTML = `
             <div class="loading" style="grid-column: span 3;">
-                <i class="fas fa-newspaper"></i> Nessuna notizia disponibile per questa categoria.
+                <i class="fas fa-newspaper"></i> No news available for this category.
             </div>
         `;
         return;
     }
     
-    // Limita a 9 notizie per mantenere 3 per riga
-    const itemsToShow = newsItems.slice(0, 9);
-    
-    // Genera HTML per ogni notizia
-    const newsHTML = itemsToShow.map(item => `
+    // Generate HTML for each news item
+    const newsHTML = newsItems.map(item => `
         <div class="news-card">
             <img src="${item.image}" alt="${item.title}" class="news-image" onerror="this.src='https://images.unsplash.com/photo-1588681664899-f142ff2dc9b1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80'">
             <div class="news-content">
@@ -322,6 +229,9 @@ function renderNews(newsItems) {
                     <span class="news-source">${item.source}</span>
                     <span>${formatDate(item.published_at)}</span>
                 </div>
+                <a href="${item.url}" target="_blank" class="read-now-btn">
+                    <i class="fas fa-external-link-alt"></i> Read Now
+                </a>
             </div>
         </div>
     `).join('');
@@ -329,7 +239,37 @@ function renderNews(newsItems) {
     container.innerHTML = newsHTML;
 }
 
-// Event listener per i pulsanti delle categorie
+// Function to refresh news
+function refreshNews() {
+    const refreshBtn = document.getElementById('refresh-news');
+    const originalText = refreshBtn.innerHTML;
+    
+    // Add spinning animation to button
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+    refreshBtn.disabled = true;
+    
+    // Load news without showing loading message
+    loadNews(currentCategory, false).then(() => {
+        // Reset button after 1 second
+        setTimeout(() => {
+            refreshBtn.innerHTML = originalText;
+            refreshBtn.disabled = false;
+            
+            // Show success message
+            const countElement = document.getElementById('news-count');
+            const originalCount = countElement.textContent;
+            countElement.textContent = '✓ Refreshed!';
+            countElement.style.color = '#4CAF50';
+            
+            setTimeout(() => {
+                countElement.textContent = originalCount;
+                countElement.style.color = '';
+            }, 2000);
+        }, 1000);
+    });
+}
+
+// Event listeners for category buttons
 document.querySelectorAll('.category-btn').forEach(button => {
     button.addEventListener('click', () => {
         const category = button.dataset.category;
@@ -337,12 +277,23 @@ document.querySelectorAll('.category-btn').forEach(button => {
     });
 });
 
-// Carica le notizie iniziali all'avvio
+// Event listener for refresh button
+document.getElementById('refresh-news').addEventListener('click', refreshNews);
+
+// Add keyboard shortcut F5 to refresh news
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'F5') {
+        event.preventDefault();
+        refreshNews();
+    }
+});
+
+// Load initial news on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadNews('top');
     
-    // Ricarica automaticamente le notizie ogni 2 minuti
+    // Auto-refresh news every 5 minutes
     setInterval(() => {
-        loadNews(currentCategory);
-    }, 120000); // 120000 ms = 2 minuti
+        refreshNews();
+    }, 300000); // 300000 ms = 5 minutes
 });
