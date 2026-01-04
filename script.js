@@ -27,64 +27,64 @@ setInterval(updateDateTime, 1000);
 updateDateTime(); // Initial call
 
 // Global variables
-let currentCategory = 'top';
+let currentCategory = 'commercial';
 let currentNewsData = [];
 let autoRefreshInterval;
 
-// API endpoints - using public APIs that don't require keys
+// API endpoints for commercial space news
 const apiEndpoints = {
-    'top': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=18',
-    'world': 'https://newsdata.io/api/1/latest?apikey=pub_385374d83e64c3e8b5a134553e6c7f25b2f93&country=us,gb&language=en',
-    'sport': 'https://newsdata.io/api/1/latest?apikey=pub_385374d83e64c3e8b5a134553e6c7f25b2f93&category=sports&language=en',
-    'finance': 'https://newsdata.io/api/1/latest?apikey=pub_385374d83e64c3e8b5a134553e6c7f25b2f93&category=business&language=en',
+    'commercial': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=18&search=commercial',
+    'satellites': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=3&search=satellite',
+    'launches': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=3&search=launch',
+    'spacex': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=3&search=spacex',
     'technology': 'https://api.spaceflightnewsapi.net/v4/articles/?limit=3&search=technology'
 };
 
-// Comprehensive sample data for fallback
+// Comprehensive commercial space sample data
 const sampleNews = {
-    'top': Array.from({length: 18}, (_, i) => ({
-        title: `Breaking News ${i + 1}: Global Summit Addresses Climate Crisis`,
-        description: `World leaders gather for urgent climate talks as new data shows accelerating environmental changes. The summit focuses on implementing the Paris Agreement targets ahead of schedule.`,
-        image: `https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${i + 1}`,
-        source: ["Global News", "Reuters", "AP News", "BBC", "CNN", "Al Jazeera"][i % 6],
+    'commercial': Array.from({length: 18}, (_, i) => ({
+        title: `Commercial Space Venture ${i + 1} Raises $${(100 + i * 50)}M Funding`,
+        description: `New commercial space company announces successful funding round for orbital infrastructure development. The investment will accelerate deployment of next-generation satellite constellations.`,
+        image: `https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&auto=format&fit=crop&w=1171&q=${i + 1}`,
+        source: ["SpaceNews", "Space.com", "NASASpaceFlight", "TechCrunch Space", "Bloomberg Space"][i % 5],
         published_at: new Date(Date.now() - i * 3600000).toISOString(),
-        url: `https://example.com/news/top-story-${i + 1}`,
-        category: ["Politics", "Environment", "World", "Science", "Health", "Technology"][i % 6]
+        url: `https://spacenews.com/article/commercial-venture-${i + 1}`,
+        category: "Commercial Space"
     })),
-    'world': Array.from({length: 3}, (_, i) => ({
-        title: `World Update ${i + 1}: Diplomatic Relations Strengthened`,
-        description: `Countries establish new trade agreements and diplomatic ties in a move towards global cooperation and economic stability in the post-pandemic era.`,
-        image: `https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${i + 1}`,
-        source: ["World News Network", "International Herald", "Global Dispatch"][i % 3],
+    'satellites': Array.from({length: 3}, (_, i) => ({
+        title: `Next-Gen Satellite Constellation ${i + 1} Launches Successfully`,
+        description: `Commercial satellite operator completes deployment of new imaging/sensing constellation, promising unprecedented Earth observation capabilities for commercial clients.`,
+        image: `https://images.unsplash.com/photo-1541188495357-ad2f6d6d1e9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${i + 1}`,
+        source: ["Satellite Today", "Space Intel", "Orbital News"][i % 3],
         published_at: new Date(Date.now() - i * 7200000).toISOString(),
-        url: `https://example.com/news/world-${i + 1}`,
-        category: "World"
+        url: `https://satellitetoday.com/launch-update-${i + 1}`,
+        category: "Satellites"
     })),
-    'sport': Array.from({length: 3}, (_, i) => ({
-        title: `Sports Report ${i + 1}: Championship Finals Reach Climax`,
-        description: `After an intense season, the championship finals are set with unexpected teams making it to the last stage, promising thrilling matches for fans worldwide.`,
-        image: `https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${i + 1}`,
-        source: ["Sports Network", "ESPN", "Sky Sports"][i % 3],
-        published_at: new Date(Date.now() - i * 5400000).toISOString(),
-        url: `https://example.com/news/sports-${i + 1}`,
-        category: "Sports"
-    })),
-    'finance': Array.from({length: 3}, (_, i) => ({
-        title: `Financial Bulletin ${i + 1}: Markets Show Strong Recovery Signs`,
-        description: `Stock markets demonstrate resilience with technology and renewable energy sectors leading the way in a broader economic recovery across major indices.`,
-        image: `https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${i + 1}`,
-        source: ["Financial Times", "Bloomberg", "Wall Street Journal"][i % 3],
+    'launches': Array.from({length: 3}, (_, i) => ({
+        title: `Commercial Launch ${i + 1} Successfully Deploys Payloads`,
+        description: `Rocket launch company completes mission for multiple commercial customers, deploying communications and Earth observation satellites to precise orbits.`,
+        image: `https://images.unsplash.com/photo-1541188495357-ad2f6d6d1e9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${i + 1}`,
+        source: ["Launch Report", "Spaceflight Now", "Rocket News"][i % 3],
         published_at: new Date(Date.now() - i * 10800000).toISOString(),
-        url: `https://example.com/news/finance-${i + 1}`,
-        category: "Finance"
+        url: `https://launchreport.com/mission-${i + 1}`,
+        category: "Launches"
+    })),
+    'spacex': Array.from({length: 3}, (_, i) => ({
+        title: `SpaceX Announces New Commercial Contract ${i + 1}`,
+        description: `SpaceX secures additional commercial launch contracts and announces progress on next-generation spacecraft development for orbital and interplanetary missions.`,
+        image: `https://images.unsplash.com/photo-1516849677043-ef67c9557e16?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${i + 1}`,
+        source: ["SpaceX Updates", "Commercial Spaceflight", "Elon Musk News"][i % 3],
+        published_at: new Date(Date.now() - i * 5400000).toISOString(),
+        url: `https://spacexupdates.com/contract-${i + 1}`,
+        category: "SpaceX"
     })),
     'technology': Array.from({length: 3}, (_, i) => ({
-        title: `Tech Innovation ${i + 1}: Breakthrough in Quantum Computing`,
-        description: `Researchers announce significant progress in quantum computing technology, potentially revolutionizing data processing and cryptographic security systems.`,
+        title: `Space Technology Breakthrough ${i + 1} Announced`,
+        description: `Commercial space company reveals new propulsion/communication technology that promises to revolutionize satellite operations and reduce costs for commercial operators.`,
         image: `https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${i + 1}`,
-        source: ["TechCrunch", "Wired", "The Verge"][i % 3],
+        source: ["Space Tech Daily", "Innovation in Space", "Future Space Tech"][i % 3],
         published_at: new Date(Date.now() - i * 3600000).toISOString(),
-        url: `https://example.com/news/tech-${i + 1}`,
+        url: `https://spacetechdaily.com/breakthrough-${i + 1}`,
         category: "Technology"
     }))
 };
@@ -111,20 +111,20 @@ async function loadNews(category, showLoading = true) {
     if (showLoading) {
         container.innerHTML = `
             <div class="loading">
-                <i class="fas fa-spinner fa-spin"></i> Loading ${category} news...
+                <i class="fas fa-satellite fa-spin"></i> Loading ${category} news...
             </div>
         `;
     }
     
     // Update section title
     const categoryTitles = {
-        'top': 'Top Stories',
-        'world': 'World News',
-        'sport': 'Sports',
-        'finance': 'Finance',
-        'technology': 'Technology'
+        'commercial': 'Commercial Space News',
+        'satellites': 'Satellite Updates',
+        'launches': 'Launch Reports',
+        'spacex': 'SpaceX Commercial News',
+        'technology': 'Space Technology'
     };
-    title.textContent = categoryTitles[category] || 'News';
+    title.textContent = categoryTitles[category] || 'Space News';
     
     // Update active button state
     document.querySelectorAll('.category-btn').forEach(btn => {
@@ -139,6 +139,7 @@ async function loadNews(category, showLoading = true) {
     
     try {
         let newsData = [];
+        const expectedCount = category === 'commercial' ? 18 : 3;
         
         // Try to fetch from API first
         if (apiEndpoints[category]) {
@@ -147,39 +148,25 @@ async function loadNews(category, showLoading = true) {
             if (response.ok) {
                 const data = await response.json();
                 
-                // Transform API data to our format based on API structure
-                if (category === 'top' || category === 'technology') {
-                    // Spaceflight News API format
-                    newsData = (data.results || data).map((item, index) => ({
-                        title: item.title || `News ${index + 1}`,
-                        description: item.summary || item.description || "No description available",
-                        image: item.image_url || item.urlToImage || `https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${index + 1}`,
-                        source: item.news_site || "News Source",
+                // Transform API data to our format
+                if (data.results) {
+                    newsData = data.results.map((item, index) => ({
+                        title: item.title || `Space News ${index + 1}`,
+                        description: item.summary || "Latest commercial space development.",
+                        image: item.image_url || `https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&auto=format&fit=crop&w=1171&q=${index + 1}`,
+                        source: item.news_site || "Space News Source",
                         published_at: item.published_at || new Date().toISOString(),
-                        url: item.url || `https://example.com/news/${category}-${index + 1}`,
-                        category: item.category || category
-                    }));
-                } else {
-                    // NewsData.io API format
-                    newsData = (data.results || []).map((item, index) => ({
-                        title: item.title || `News ${index + 1}`,
-                        description: item.description || "No description available",
-                        image: item.image_url || `https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=${index + 1}`,
-                        source: item.source_id || "News Source",
-                        published_at: item.pubDate || new Date().toISOString(),
-                        url: item.link || `https://example.com/news/${category}-${index + 1}`,
-                        category: item.category || category
+                        url: item.url || `https://spacenews.com/article/${category}-${index + 1}`,
+                        category: category
                     }));
                 }
             }
         }
         
         // If no data from API or not enough items, use sample data
-        const expectedCount = category === 'top' ? 18 : 3;
-        
         if (newsData.length < expectedCount) {
             // Supplement with sample data
-            const supplementData = sampleNews[category] || sampleNews.top;
+            const supplementData = sampleNews[category] || sampleNews.commercial;
             const needed = expectedCount - newsData.length;
             const supplement = supplementData.slice(0, needed);
             newsData = [...newsData, ...supplement];
@@ -192,29 +179,29 @@ async function loadNews(category, showLoading = true) {
         currentNewsData = newsData;
         
         // Update news count
-        countElement.textContent = `${newsData.length} News Articles`;
+        countElement.textContent = `${newsData.length} Space Updates`;
         
         // Render news
         renderNews(newsData);
         
     } catch (error) {
-        console.error('Error loading news:', error);
+        console.error('Error loading space news:', error);
         
         // In case of error, use sample data
-        let newsData = sampleNews[category] || sampleNews.top;
-        const expectedCount = category === 'top' ? 18 : 3;
+        let newsData = sampleNews[category] || sampleNews.commercial;
+        const expectedCount = category === 'commercial' ? 18 : 3;
         newsData = newsData.slice(0, expectedCount);
         currentNewsData = newsData;
         
-        countElement.textContent = `${newsData.length} News Articles`;
+        countElement.textContent = `${newsData.length} Space Updates`;
         renderNews(newsData);
         
         // Show error message
         if (showLoading) {
             container.innerHTML += `
-                <div class="loading" style="grid-column: span 3; color: #d32f2f; margin-top: 20px;">
+                <div class="loading" style="grid-column: span 3; color: #ff6b6b; margin-top: 20px;">
                     <i class="fas fa-exclamation-triangle"></i> 
-                    Unable to load real-time news. Showing latest available news.
+                    Using cached space news. Real-time updates may be delayed.
                 </div>
             `;
         }
@@ -228,7 +215,7 @@ function renderNews(newsItems) {
     if (!newsItems || newsItems.length === 0) {
         container.innerHTML = `
             <div class="loading" style="grid-column: span 3;">
-                <i class="fas fa-newspaper"></i> No news available for this category.
+                <i class="fas fa-satellite"></i> No space news available for this category.
             </div>
         `;
         return;
@@ -237,16 +224,16 @@ function renderNews(newsItems) {
     // Generate HTML for each news item
     const newsHTML = newsItems.map(item => `
         <div class="news-card">
-            <img src="${item.image}" alt="${item.title}" class="news-image" onerror="this.src='https://images.unsplash.com/photo-1588681664899-f142ff2dc9b1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80'">
+            <img src="${item.image}" alt="${item.title}" class="news-image" onerror="this.src='https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80'">
             <div class="news-content">
                 <h3 class="news-title">${item.title}</h3>
-                <p class="news-desc">${item.description.length > 150 ? item.description.substring(0, 150) + '...' : item.description}</p>
+                <p class="news-desc">${item.description.length > 120 ? item.description.substring(0, 120) + '...' : item.description}</p>
                 <div class="news-meta">
                     <span class="news-source">${item.source}</span>
                     <span>${formatDate(item.published_at)}</span>
                 </div>
                 <a href="${item.url}" target="_blank" class="read-now-btn">
-                    <i class="fas fa-external-link-alt"></i> Read Full Article
+                    <i class="fas fa-external-link-alt"></i> Full Report
                 </a>
             </div>
         </div>
@@ -262,7 +249,7 @@ function refreshNews() {
     const originalText = refreshBtn.innerHTML;
     
     // Add spinning animation to button and disable it
-    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+    refreshBtn.innerHTML = '<i class="fas fa-satellite fa-spin"></i> Refreshing...';
     refreshBtn.classList.add('refreshing');
     refreshBtn.disabled = true;
     
@@ -276,14 +263,16 @@ function refreshNews() {
             
             // Show success message
             const originalCount = countElement.textContent;
-            countElement.textContent = '✓ News Updated!';
-            countElement.style.color = '#4CAF50';
-            countElement.style.backgroundColor = '#e8f5e9';
+            countElement.textContent = '✓ Space News Updated';
+            countElement.style.color = '#32CD32';
+            countElement.style.backgroundColor = '#e6f7ff';
+            countElement.style.borderColor = '#32CD32';
             
             setTimeout(() => {
                 countElement.textContent = originalCount;
                 countElement.style.color = '';
                 countElement.style.backgroundColor = '';
+                countElement.style.borderColor = '';
             }, 2000);
         }, 1500);
     }).catch(() => {
@@ -291,6 +280,26 @@ function refreshNews() {
         refreshBtn.innerHTML = originalText;
         refreshBtn.classList.remove('refreshing');
         refreshBtn.disabled = false;
+    });
+}
+
+// Back to Top functionality
+function setupBackToTop() {
+    const backToTopBtn = document.getElementById('back-to-top');
+    
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    });
+    
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     });
 }
 
@@ -303,7 +312,7 @@ function setupAutoRefresh() {
     
     // Set new interval for auto-refresh every 5 minutes
     autoRefreshInterval = setInterval(() => {
-        console.log('Auto-refreshing news...');
+        console.log('Auto-refreshing space news...');
         refreshNews();
     }, 300000); // 300000 ms = 5 minutes
 }
@@ -333,21 +342,22 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Load initial news on page load
+// Load initial news on page load and setup everything
 document.addEventListener('DOMContentLoaded', () => {
-    loadNews('top');
+    loadNews('commercial');
+    setupBackToTop();
     setupAutoRefresh();
     
-    // Display auto-refresh info
+    // Display welcome message
     setTimeout(() => {
         const countElement = document.getElementById('news-count');
         const originalText = countElement.textContent;
-        countElement.textContent = 'Auto-refresh every 5 minutes';
-        countElement.style.color = '#ff9800';
+        countElement.textContent = 'Commercial Space Intelligence Active';
+        countElement.style.color = '#32CD32';
         
         setTimeout(() => {
             countElement.textContent = originalText;
             countElement.style.color = '';
         }, 3000);
-    }, 2000);
+    }, 1000);
 });
